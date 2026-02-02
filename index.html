@@ -99,10 +99,18 @@
                 const data = await response.json();
                 
                 // Update Metadata
-                const lastSyncTime = new Date(data.system.last_backup).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+                const lastBackup = new Date(data.system.last_backup);
+                const now = new Date();
+                const diffMs = now - lastBackup;
+                const diffMin = Math.floor(diffMs / 1000 / 60);
+                const diffSec = Math.floor((diffMs / 1000) % 60);
+                
+                let timeStr = diffMin > 0 ? `${diffMin}m ${diffSec}s AGO` : `${diffSec}s AGO`;
+                if (diffMs < 0) timeStr = "JUST NOW"; // Handle clock drift
+
                 document.getElementById('last-updated').innerText = 'LAST_PULSE: ' + new Date(data.updated_at).toLocaleTimeString();
                 document.getElementById('model-info').innerText = `${data.system.model} / ${data.system.context}`;
-                document.getElementById('github-sync').innerText = lastSyncTime;
+                document.getElementById('github-sync').innerText = timeStr;
                 
                 // Update Rotations
                 const rotList = document.getElementById('rotation-list');
