@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Statim | OS v3.0</title>
+    <title>Statim | Neural Core</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap">
     <style>
@@ -12,7 +12,7 @@
             background: rgba(15, 15, 15, 0.6); 
             backdrop-filter: blur(40px); 
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 4px; /* Sharper corners as requested */
+            border-radius: 4px;
         }
         .accent-border { border-left: 3px solid #007AFF; }
         .mono { font-family: 'JetBrains Mono', monospace; }
@@ -25,8 +25,6 @@
 <body class="p-4 md:p-10">
     <div class="scanline"></div>
     <div class="max-w-[1400px] mx-auto">
-        
-        <!-- Top Nav / Info Bar -->
         <div class="flex flex-wrap justify-between items-center mb-10 gap-4">
             <div class="flex items-center gap-4">
                 <div class="w-2 h-8 bg-blue-600"></div>
@@ -38,18 +36,16 @@
             <div class="flex gap-8">
                 <div class="text-right">
                     <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">Model / Context</p>
-                    <p class="text-xs font-bold mono" id="model-info">GEMINI-3-FLASH / 1.0M</p>
+                    <p class="text-xs font-bold mono" id="model-info">INIT...</p>
                 </div>
                 <div class="text-right">
                     <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">GitHub Sync</p>
-                    <p class="text-xs font-bold mono text-green-500" id="github-sync">SUCCESS</p>
+                    <p class="text-xs font-bold mono text-green-500" id="github-sync">SYNCING...</p>
                 </div>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-            
-            <!-- System Pulse Card -->
             <div class="lg:col-span-3 sharp-card p-6 accent-border">
                 <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-8">System Pulse</p>
                 <div class="flex items-center justify-between mb-2">
@@ -59,35 +55,28 @@
                 <p class="text-[10px] text-gray-500 mono">ACTIVE_TASKS: 0</p>
                 <div class="mt-8 pt-8 border-t border-white/5">
                     <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-4">Rotations</p>
-                    <div class="space-y-3" id="rotation-list">
-                        <!-- Rotations injected here -->
-                    </div>
+                    <div class="space-y-3" id="rotation-list"></div>
                 </div>
             </div>
 
-            <!-- Notion Matrix Card -->
             <div class="lg:col-span-5 sharp-card p-6">
                 <div class="flex justify-between items-center mb-8">
                     <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Notion Task Matrix</p>
                     <span class="text-[9px] font-bold text-blue-500 uppercase tracking-widest mono">Live Feed</span>
                 </div>
                 <div class="space-y-1" id="notion-tasks">
-                    <div class="text-center py-10 text-gray-600 text-xs mono">Querying database...</div>
+                    <div class="text-center py-10 text-gray-600 text-xs mono">Initializing feed...</div>
                 </div>
             </div>
 
-            <!-- Journal / Thoughts Card -->
             <div class="lg:col-span-4 sharp-card p-6 bg-blue-600/5">
                 <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-8">Neural Journal</p>
-                <div class="space-y-6" id="journal">
-                    <!-- Journal entries injected here -->
-                </div>
+                <div class="space-y-4" id="journal"></div>
             </div>
         </div>
 
-        <!-- Footer -->
         <footer class="mt-10 flex justify-between items-center px-2">
-            <div class="text-[9px] font-bold text-gray-700 uppercase tracking-widest mono">Statim OS v3.0.0 // 2026-02-01</div>
+            <div class="text-[9px] font-bold text-gray-700 uppercase tracking-widest mono">Statim OS v3.1.2 // 2026-02-01</div>
             <div class="text-[9px] font-bold text-blue-900 uppercase tracking-widest mono" id="last-updated">SYNC_INIT</div>
         </footer>
     </div>
@@ -96,37 +85,21 @@
         async function fetchData() {
             try {
                 const response = await fetch('public_dashboard.json?nocache=' + Date.now());
+                if (!response.ok) throw new Error('Network response was not ok');
                 const data = await response.json();
                 
-                // Update Metadata
+                document.getElementById('last-updated').innerText = 'LAST_PULSE: ' + new Date(data.updated_at).toLocaleTimeString();
+                document.getElementById('model-info').innerText = `${data.system.model} / ${data.system.context}`;
+                
                 const lastBackup = new Date(data.system.last_backup);
                 const now = new Date();
                 const diffMs = now - lastBackup;
                 const diffMin = Math.floor(diffMs / 1000 / 60);
                 const diffSec = Math.floor((diffMs / 1000) % 60);
-                
                 let timeStr = diffMin > 0 ? `${diffMin}m ${diffSec}s AGO` : `${diffSec}s AGO`;
-                if (diffMs < 0) timeStr = "JUST NOW"; // Handle clock drift
-
-                document.getElementById('last-updated').innerText = 'LAST_PULSE: ' + new Date(data.updated_at).toLocaleTimeString();
-                document.getElementById('model-info').innerText = `${data.system.model} / ${data.system.context}`;
+                if (diffMs < 0) timeStr = "JUST NOW";
                 document.getElementById('github-sync').innerText = timeStr;
                 
-                // Update Rotations
-                const rotList = document.getElementById('rotation-list');
-                rotList.innerHTML = '';
-                Object.entries(data.tasks).forEach(([key, val]) => {
-                    const diff = (new Date() - new Date(val)) / 1000 / 60 / 60;
-                    const status = diff < 24 ? 'text-blue-400' : 'text-amber-500';
-                    rotList.innerHTML += `
-                        <div class="flex justify-between items-center text-[10px] mono">
-                            <span class="text-gray-400">${key.toUpperCase()}</span>
-                            <span class="${status}">${diff.toFixed(1)}h AGO</span>
-                        </div>
-                    `;
-                });
-
-                // Update Journal
                 const journal = document.getElementById('journal');
                 journal.innerHTML = '';
                 data.journal.forEach(entry => {
@@ -140,10 +113,8 @@
                     `;
                 });
 
-                // Fetch Notion Tasks directly using the helper in the pulse script or separate fetch
-                // For now, let's assume export_dashboard_data.js will soon include them.
-                if (data.notion_tasks) {
-                    const taskList = document.getElementById('notion-tasks');
+                const taskList = document.getElementById('notion-tasks');
+                if (data.notion_tasks && data.notion_tasks.length > 0) {
                     taskList.innerHTML = '';
                     data.notion_tasks.forEach(task => {
                         taskList.innerHTML += `
@@ -156,11 +127,15 @@
                             </div>
                         `;
                     });
+                } else {
+                    taskList.innerHTML = '<div class="text-center py-10 text-gray-600 text-xs mono">No active tasks found.</div>';
                 }
 
-            } catch (err) { console.error(err); }
+            } catch (err) { 
+                console.error("Dashboard error:", err);
+                document.getElementById('github-sync').innerText = "FETCH_ERROR";
+            }
         }
-
         fetchData();
         setInterval(fetchData, 15000);
     </script>
