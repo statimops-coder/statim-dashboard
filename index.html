@@ -116,6 +116,16 @@
                 document.getElementById('api-eff').innerText = data.performance.api_efficiency + ' EFFICIENCY';
                 document.getElementById('muscle-count').innerText = data.performance.active_muscles + ' ACTIVE';
                 
+                // Update Task Stats if present
+                if (data.task_stats) {
+                    const brainHeader = document.getElementById('brain-activity');
+                    brainHeader.innerHTML = `
+                        <span class="text-blue-500">${data.task_stats.doing} ACTIVE</span> 
+                        <span class="text-gray-700 px-4">/</span> 
+                        <span class="text-gray-400">${data.task_stats.todo} BACKLOG</span>
+                    `;
+                }
+
                 const lastBackup = new Date(data.system.last_backup);
                 const now = new Date();
                 const diffMs = now - lastBackup;
