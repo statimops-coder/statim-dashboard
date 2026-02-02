@@ -3,165 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Statim | Neural Interface</title>
+    <title>Statim | OS v3.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #000; color: #fff; }
-        .glass-card { 
-            background: rgba(255, 255, 255, 0.05); 
-            backdrop-filter: blur(25px) saturate(180%); 
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        body { font-family: 'Inter', sans-serif; background-color: #050505; color: #fff; overflow-x: hidden; }
+        .sharp-card { 
+            background: rgba(15, 15, 15, 0.6); 
+            backdrop-filter: blur(40px); 
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 4px; /* Sharper corners as requested */
         }
-        .glass-card:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-        .accent-gradient {
-            background: linear-gradient(135deg, #007AFF 0%, #00C7BE 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .pulse-dot {
-            width: 8px;
-            height: 8px;
-            background: #34C759;
-            border-radius: 50%;
-            box-shadow: 0 0 15px rgba(52, 199, 89, 0.6);
-            animation: pulse-ring 2s infinite;
-        }
-        @keyframes pulse-ring {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.5); opacity: 0.5; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .scroll-hide::-webkit-scrollbar { display: none; }
+        .accent-border { border-left: 3px solid #007AFF; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .glow-text { text-shadow: 0 0 20px rgba(0, 122, 255, 0.5); }
+        .task-row:not(:last-child) { border-bottom: 1px solid rgba(255,255,255,0.03); }
+        @keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(1000%); } }
+        .scanline { width: 100%; height: 100px; background: linear-gradient(to bottom, transparent, rgba(0, 122, 255, 0.03), transparent); position: fixed; top: 0; pointer-events: none; animation: scanline 8s linear infinite; }
     </style>
 </head>
-<body class="p-4 md:p-12 min-h-screen">
-    <div class="max-w-6xl mx-auto">
-        <!-- Header -->
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-16 gap-6">
-            <div>
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="w-10 h-10 bg-white rounded-2xl flex items-center justify-center text-black font-black text-xl shadow-2xl">⚡</div>
-                    <span class="font-bold text-2xl tracking-tighter">STATIM.OPS</span>
-                </div>
-                <h1 class="text-5xl font-bold tracking-tight mb-2">Neural Interface</h1>
-                <p class="text-gray-500 font-medium">Session Active • Host: ip-172-31-9-200</p>
-            </div>
-            <div id="status-chip" class="glass-card px-6 py-3 rounded-full flex items-center gap-3">
-                <div class="pulse-dot"></div>
-                <span class="text-sm font-bold tracking-widest uppercase">System Nominal</span>
-            </div>
-        </header>
-
-        <!-- Main Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-            <!-- Token/API Health -->
-            <div class="glass-card rounded-[2.5rem] p-8 md:col-span-2">
-                <div class="flex justify-between items-start mb-8">
-                    <p class="text-[11px] font-bold text-gray-500 uppercase tracking-[0.2em]">Neural Capacity</p>
-                    <span class="text-[11px] font-bold text-blue-400 uppercase tracking-widest">Active</span>
-                </div>
-                <div class="flex items-baseline gap-2 mb-4">
-                    <span class="text-6xl font-black tracking-tighter">1.0</span>
-                    <span class="text-2xl font-bold text-gray-600">M</span>
-                </div>
-                <p class="text-gray-400 text-sm font-medium mb-6">Available tokens in current context window.</p>
-                <div class="w-full bg-white/5 rounded-full h-2 overflow-hidden">
-                    <div class="bg-gradient-to-r from-blue-500 to-cyan-400 h-full w-[85%] transition-all duration-1000"></div>
+<body class="p-4 md:p-10">
+    <div class="scanline"></div>
+    <div class="max-w-[1400px] mx-auto">
+        
+        <!-- Top Nav / Info Bar -->
+        <div class="flex flex-wrap justify-between items-center mb-10 gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-2 h-8 bg-blue-600"></div>
+                <div>
+                    <h1 class="text-xl font-black tracking-tighter mono uppercase">Statim.Neural.Core</h1>
+                    <p class="text-[9px] font-bold text-blue-500 uppercase tracking-widest mono">Host: ip-172-31-9-200 // Auth: Nan</p>
                 </div>
             </div>
-
-            <!-- Task Load -->
-            <div class="glass-card rounded-[2.5rem] p-8">
-                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-8">Rotations</p>
-                <div class="space-y-6">
-                    <div class="flex justify-between items-center">
-                        <span class="text-sm font-semibold text-gray-300">Notion Sync</span>
-                        <span id="notion-status" class="text-xs font-bold text-green-400">OK</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-sm font-semibold text-gray-300">News Scan</span>
-                        <span class="text-xs font-bold text-gray-500">Idle</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-sm font-semibold text-gray-300">Clawd Scouting</span>
-                        <span class="text-xs font-bold text-red-500">Error</span>
-                    </div>
+            <div class="flex gap-8">
+                <div class="text-right">
+                    <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">Model / Context</p>
+                    <p class="text-xs font-bold mono" id="model-info">GEMINI-3-FLASH / 1.0M</p>
                 </div>
-            </div>
-
-            <!-- Dashboard Pulse -->
-            <div class="glass-card rounded-[2.5rem] p-8">
-                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-8">Pulse (Crontab)</p>
-                <div class="flex flex-col items-center justify-center py-4">
-                    <span id="update-timer" class="text-4xl font-black tracking-tighter accent-gradient">5m</span>
-                    <span class="text-[10px] font-bold text-gray-600 uppercase mt-2">Zero-API Frequency</span>
+                <div class="text-right">
+                    <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">GitHub Sync</p>
+                    <p class="text-xs font-bold mono text-green-500" id="github-sync">SUCCESS</p>
                 </div>
             </div>
         </div>
 
-        <!-- Journal Space -->
-        <div class="glass-card rounded-[3rem] p-10">
-            <div class="flex justify-between items-center mb-10">
-                <h2 class="text-2xl font-bold tracking-tight">Daily Journal</h2>
-                <div class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">Latest Reflections</div>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            
+            <!-- System Pulse Card -->
+            <div class="lg:col-span-3 sharp-card p-6 accent-border">
+                <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-8">System Pulse</p>
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-4xl font-black tracking-tighter glow-text">NOMINAL</span>
+                    <div class="w-3 h-3 bg-blue-500 rounded-full animate-pulse shadow-[0_0_15px_#007AFF]"></div>
+                </div>
+                <p class="text-[10px] text-gray-500 mono">ACTIVE_TASKS: 0</p>
+                <div class="mt-8 pt-8 border-t border-white/5">
+                    <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-4">Rotations</p>
+                    <div class="space-y-3" id="rotation-list">
+                        <!-- Rotations injected here -->
+                    </div>
+                </div>
             </div>
-            <div id="journal" class="space-y-8 max-h-[400px] overflow-y-auto scroll-hide pr-4">
-                <!-- Journal entries will be injected here -->
+
+            <!-- Notion Matrix Card -->
+            <div class="lg:col-span-5 sharp-card p-6">
+                <div class="flex justify-between items-center mb-8">
+                    <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Notion Task Matrix</p>
+                    <span class="text-[9px] font-bold text-blue-500 uppercase tracking-widest mono">Live Feed</span>
+                </div>
+                <div class="space-y-1" id="notion-tasks">
+                    <div class="text-center py-10 text-gray-600 text-xs mono">Querying database...</div>
+                </div>
+            </div>
+
+            <!-- Journal / Thoughts Card -->
+            <div class="lg:col-span-4 sharp-card p-6 bg-blue-600/5">
+                <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-8">Neural Journal</p>
+                <div class="space-y-6" id="journal">
+                    <!-- Journal entries injected here -->
+                </div>
             </div>
         </div>
 
-        <footer class="mt-12 flex justify-between items-center text-[10px] font-bold text-gray-600 uppercase tracking-widest">
-            <div>Statim-v1.0.4 • 2026</div>
-            <div id="last-sync">Syncing Neural Interface...</div>
+        <!-- Footer -->
+        <footer class="mt-10 flex justify-between items-center px-2">
+            <div class="text-[9px] font-bold text-gray-700 uppercase tracking-widest mono">Statim OS v3.0.0 // 2026-02-01</div>
+            <div class="text-[9px] font-bold text-blue-900 uppercase tracking-widest mono" id="last-updated">SYNC_INIT</div>
         </footer>
     </div>
 
     <script>
-        async function updateDashboard() {
+        async function fetchData() {
             try {
-                const res = await fetch('./public_dashboard.json?t=' + Date.now());
-                const data = await res.json();
+                const response = await fetch('public_dashboard.json?nocache=' + Date.now());
+                const data = await response.json();
                 
-                // Update Timestamp
-                const time = new Date(data.updated_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                document.getElementById('last-sync').innerText = 'Neural Sync: ' + time;
+                // Update Metadata
+                document.getElementById('last-updated').innerText = 'LAST_PULSE: ' + new Date(data.updated_at).toLocaleTimeString();
+                document.getElementById('model-info').innerText = `${data.system.model} / ${data.system.context}`;
                 
+                // Update Rotations
+                const rotList = document.getElementById('rotation-list');
+                rotList.innerHTML = '';
+                Object.entries(data.tasks).forEach(([key, val]) => {
+                    const diff = (new Date() - new Date(val)) / 1000 / 60 / 60;
+                    const status = diff < 24 ? 'text-blue-400' : 'text-amber-500';
+                    rotList.innerHTML += `
+                        <div class="flex justify-between items-center text-[10px] mono">
+                            <span class="text-gray-400">${key.toUpperCase()}</span>
+                            <span class="${status}">${diff.toFixed(1)}h AGO</span>
+                        </div>
+                    `;
+                });
+
                 // Update Journal
                 const journal = document.getElementById('journal');
                 journal.innerHTML = '';
-                data.journal.forEach((entry, i) => {
-                    const div = document.createElement('div');
-                    div.className = 'flex gap-6 items-start group';
-                    div.innerHTML = `
-                        <div class="text-[10px] font-bold text-gray-600 w-12 pt-1 group-hover:text-blue-400 transition-colors">0${i+1}</div>
-                        <div class="flex-1">
-                            <p class="text-lg font-medium text-gray-200 leading-relaxed">${entry}</p>
+                data.journal.forEach(entry => {
+                    journal.innerHTML += `
+                        <div class="flex gap-4">
+                            <div class="text-[9px] text-blue-600 font-black mt-1">>></div>
+                            <p class="text-xs font-medium text-gray-300 leading-relaxed">${entry}</p>
                         </div>
                     `;
-                    journal.appendChild(div);
                 });
 
-                // Update Notion specific
-                if (data.tasks.notion_sync) {
-                    const lastSync = new Date(data.tasks.notion_sync);
-                    const now = new Date();
-                    const diff = (now - lastSync) / 1000 / 60; // minutes
-                    document.getElementById('notion-status').innerText = diff < 240 ? 'OK' : 'OVERDUE';
+                // Fetch Notion Tasks directly using the helper in the pulse script or separate fetch
+                // For now, let's assume export_dashboard_data.js will soon include them.
+                if (data.notion_tasks) {
+                    const taskList = document.getElementById('notion-tasks');
+                    taskList.innerHTML = '';
+                    data.notion_tasks.forEach(task => {
+                        taskList.innerHTML += `
+                            <div class="task-row py-3 flex justify-between items-center group cursor-crosshair">
+                                <div>
+                                    <p class="text-xs font-bold text-gray-200 group-hover:text-blue-400 transition-colors">${task.name}</p>
+                                    <p class="text-[8px] text-gray-600 mono uppercase mt-1">${task.owner} // ${task.status}</p>
+                                </div>
+                                <div class="text-[9px] font-bold ${task.priority === 'High' ? 'text-red-500' : 'text-gray-500'} mono">${task.priority}</div>
+                            </div>
+                        `;
+                    });
                 }
 
-            } catch (e) {
-                console.error('Pulse failed:', e);
-            }
+            } catch (err) { console.error(err); }
         }
 
-        updateDashboard();
-        setInterval(updateDashboard, 15000); // Check for new data every 15s
+        fetchData();
+        setInterval(fetchData, 15000);
     </script>
 </body>
 </html>
