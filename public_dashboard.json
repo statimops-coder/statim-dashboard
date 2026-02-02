@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-02-02T13:20:01.764Z",
+  "updated_at": "2026-02-02T13:25:02.222Z",
   "system": {
     "status": "Idle/Focused",
     "model": "Gemini 3 Flash",
@@ -17,6 +17,12 @@
   ],
   "notion_tasks": [
     {
+      "name": "Check out my finances ",
+      "status": "To start",
+      "owner": "Statim",
+      "priority": "Medium"
+    },
+    {
       "name": "Work on the new stats dashboard ",
       "status": "To start",
       "owner": "Statim",
@@ -24,7 +30,7 @@
     }
   ],
   "task_stats": {
-    "todo": 1,
+    "todo": 2,
     "doing": 0,
     "done": 0
   },
