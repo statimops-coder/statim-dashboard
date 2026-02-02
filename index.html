@@ -99,8 +99,10 @@
                 const data = await response.json();
                 
                 // Update Metadata
+                const lastSyncTime = new Date(data.system.last_backup).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
                 document.getElementById('last-updated').innerText = 'LAST_PULSE: ' + new Date(data.updated_at).toLocaleTimeString();
                 document.getElementById('model-info').innerText = `${data.system.model} / ${data.system.context}`;
+                document.getElementById('github-sync').innerText = lastSyncTime;
                 
                 // Update Rotations
                 const rotList = document.getElementById('rotation-list');
@@ -120,10 +122,12 @@
                 const journal = document.getElementById('journal');
                 journal.innerHTML = '';
                 data.journal.forEach(entry => {
+                    const isPartnership = entry.startsWith('[PARTNERSHIP]');
+                    const cleanEntry = entry.replace('[PARTNERSHIP]', '').replace('[SYSTEM]', '');
                     journal.innerHTML += `
-                        <div class="flex gap-4">
-                            <div class="text-[9px] text-blue-600 font-black mt-1">>></div>
-                            <p class="text-xs font-medium text-gray-300 leading-relaxed">${entry}</p>
+                        <div class="flex gap-4 p-2 ${isPartnership ? 'bg-blue-600/10 border-l-2 border-blue-500' : ''}">
+                            <div class="text-[9px] ${isPartnership ? 'text-blue-400' : 'text-gray-600'} font-black mt-1">${isPartnership ? '🤝' : '>>'}</div>
+                            <p class="text-xs font-medium ${isPartnership ? 'text-white' : 'text-gray-400'} leading-relaxed">${cleanEntry}</p>
                         </div>
                     `;
                 });
