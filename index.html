@@ -3,169 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Statim | Neural Audit</title>
+    <title>⚡ Statim | Command Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #030303; color: #fff; overflow-x: hidden; }
-        .sharp-card { 
-            background: rgba(10, 10, 10, 0.8); 
-            backdrop-filter: blur(50px); 
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 4px;
+        :root {
+            --bg-slate: #0f172a;
+            --card-slate: #1e293b;
+            --border-slate: #334155;
+            --accent-blue: #38bdf8;
+            --accent-green: #4ade80;
         }
-        .accent-blue { border-left: 2px solid #007AFF; }
-        .accent-green { border-left: 2px solid #34C759; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-slate); 
+            color: #f1f5f9; 
+            overflow-x: hidden; 
+        }
+        .sharp-card { 
+            background: var(--card-slate); 
+            border: 1px solid var(--border-slate);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
         .mono { font-family: 'JetBrains Mono', monospace; }
-        .glow-blue { text-shadow: 0 0 15px rgba(0, 122, 255, 0.4); }
-        .task-row:not(:last-child) { border-bottom: 1px solid rgba(255,255,255,0.02); }
-        @keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(1000%); } }
-        .scanline { width: 100%; height: 100px; background: linear-gradient(to bottom, transparent, rgba(0, 122, 255, 0.02), transparent); position: fixed; top: 0; pointer-events: none; animation: scanline 10s linear infinite; }
+        .activity-feed {
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-slate) transparent;
+        }
+        .activity-feed::-webkit-scrollbar { width: 4px; }
+        .activity-feed::-webkit-scrollbar-thumb { background: var(--border-slate); border-radius: 10px; }
+        @keyframes pulse-slow { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .pulse-slow { animation: pulse-slow 3s infinite; }
     </style>
 </head>
-<body class="p-4 md:p-10">
-    <div class="scanline"></div>
-    <div class="max-w-[1400px] mx-auto">
+<body class="p-4 md:p-8">
+    <div class="max-w-[1600px] mx-auto">
         
-        <!-- Audit Header -->
-        <div class="flex flex-wrap justify-between items-end mb-12 gap-4">
-            <div>
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="w-8 h-8 bg-white text-black flex items-center justify-center font-black text-sm">ST</div>
-                    <span class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.3em] mono">Statim.Audit.Interface</span>
-                </div>
-                <h1 class="text-4xl font-black tracking-tighter uppercase" id="brain-activity">Neural Idle</h1>
-            </div>
-            <div class="flex gap-12 text-right">
+        <!-- Header -->
+        <header class="flex flex-wrap justify-between items-center mb-10 gap-6 border-b border-slate-700 pb-6">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-sky-500 text-white flex items-center justify-center rounded-lg font-black text-xl shadow-lg shadow-sky-500/20">⚡</div>
                 <div>
-                    <p class="text-[9px] font-bold text-gray-600 uppercase tracking-widest mb-1">Quota Health</p>
-                    <p class="text-xs font-bold mono text-green-500" id="api-eff">98% EFFICIENCY</p>
-                </div>
-                <div>
-                    <p class="text-[9px] font-bold text-gray-600 uppercase tracking-widest mb-1">GitHub Sync</p>
-                    <p class="text-xs font-bold mono text-blue-500" id="github-sync">SYNCING...</p>
+                    <h1 class="text-2xl font-black tracking-tight text-white uppercase">Statim.Command</h1>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mono">Autonomous Intelligence Layer</p>
                 </div>
             </div>
-        </div>
+            <div class="flex gap-8 items-center">
+                <div class="text-right">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">System Health</p>
+                    <div class="flex items-center justify-end gap-2">
+                        <span class="w-2 h-2 bg-green-500 rounded-full pulse-slow"></span>
+                        <p class="text-xs font-bold mono text-emerald-400 uppercase" id="sys-status">Optimal</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Last Sync</p>
+                    <p class="text-xs font-bold mono text-sky-400" id="last-sync">--:--:--</p>
+                </div>
+            </div>
+        </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
-            <!-- Brain Status -->
-            <div class="lg:col-span-4 space-y-6">
-                <div class="sharp-card p-6 accent-blue">
-                    <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-6">Brain Metrics</p>
+            <!-- Left Column: Metrics & Logs -->
+            <div class="lg:col-span-4 space-y-8">
+                <!-- System Metrics -->
+                <section class="sharp-card p-6">
+                    <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 bg-sky-400 rounded-full"></span> System Metrics
+                    </h3>
                     <div class="space-y-4">
-                        <div class="flex justify-between items-end">
-                            <span class="text-[10px] font-bold text-gray-400 mono">MODEL:</span>
-                            <span class="text-sm font-bold mono" id="model-name">...</span>
+                        <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+                            <span class="text-xs text-slate-400 mono uppercase">Brain Activity</span>
+                            <span class="text-sm font-bold text-white mono" id="brain-activity">IDLE</span>
                         </div>
-                        <div class="flex justify-between items-end">
-                            <span class="text-[10px] font-bold text-gray-400 mono">CONTEXT:</span>
-                            <span class="text-sm font-bold mono">1.0M</span>
+                        <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+                            <span class="text-xs text-slate-400 mono uppercase">Active Muscles</span>
+                            <span class="text-sm font-bold text-emerald-400 mono" id="muscle-count">0</span>
                         </div>
-                        <div class="flex justify-between items-end">
-                            <span class="text-[10px] font-bold text-gray-400 mono">UPTIME:</span>
-                            <span class="text-sm font-bold mono" id="uptime">--</span>
+                        <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+                            <span class="text-xs text-slate-400 mono uppercase">Efficiency</span>
+                            <span class="text-sm font-bold text-sky-400 mono" id="api-eff">0%</span>
                         </div>
                     </div>
-                </div>
+                </section>
 
-                <div class="sharp-card p-6 accent-green">
-                    <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-6">Muscles (Autonomous)</p>
-                    <div class="flex items-center justify-between">
-                        <span class="text-2xl font-black tracking-tighter" id="muscle-count">0 ACTIVE</span>
-                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <!-- Live Logs Placeholder -->
+                <section class="sharp-card p-6 border-l-4 border-amber-500/50">
+                    <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center justify-between">
+                        <span>Terminal Output (Logs)</span>
+                        <span class="text-[9px] bg-slate-800 px-2 py-0.5 rounded text-amber-500 border border-amber-500/20 mono">LIVE_STREAM</span>
+                    </h3>
+                    <div id="log-container" class="bg-slate-900/50 rounded p-4 h-64 overflow-y-auto activity-feed border border-slate-800">
+                        <p class="text-[10px] text-slate-500 mono leading-relaxed">
+                            [SYSTEM] Initializing log sync protocol...<br>
+                            [SYSTEM] Awaiting gateway feedback...<br>
+                            <span class="animate-pulse">_</span>
+                        </p>
                     </div>
-                    <p class="text-[9px] text-gray-600 mt-2 mono">CRONTAB_PULSE: OK (5M_INTERVAL)</p>
-                </div>
+                </section>
             </div>
 
-            <!-- Task Audit -->
-            <div class="lg:col-span-5 sharp-card p-6">
-                <div class="flex justify-between items-center mb-8">
-                    <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Task Matrix Audit</p>
-                    <span class="text-[9px] font-bold text-blue-500 uppercase tracking-widest mono">Direct Fetch</span>
-                </div>
-                <div class="space-y-1" id="notion-tasks">
-                    <div class="text-center py-10 text-gray-700 text-xs mono">Initializing Audit...</div>
-                </div>
+            <!-- Middle Column: Live Activity Feed -->
+            <div class="lg:col-span-5 space-y-8">
+                <section class="sharp-card p-6 h-full flex flex-col">
+                    <div class="flex justify-between items-center mb-8">
+                        <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span> Live Activity Feed
+                        </h3>
+                        <span class="text-[9px] font-bold text-sky-500 uppercase tracking-widest mono">Project_Sync: Active</span>
+                    </div>
+                    <div id="activity-feed" class="space-y-4 overflow-y-auto flex-grow activity-feed pr-2">
+                        <!-- Pulling from public_dashboard.json task_stats and notion_tasks -->
+                        <div class="text-center py-20 text-slate-600 italic text-sm">
+                            Infiltrating project matrix...
+                        </div>
+                    </div>
+                </section>
             </div>
 
-            <!-- Journal Audit -->
-            <div class="lg:col-span-3 sharp-card p-6 bg-white/[0.02]">
-                <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-8">Neural Activity Journal</p>
-                <div class="space-y-4" id="journal"></div>
+            <!-- Right Column: Journal Space -->
+            <div class="lg:col-span-3 space-y-8">
+                <section class="sharp-card p-6 h-full border-t-4 border-sky-500/50">
+                    <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-8">Neural Journal</h3>
+                    <div id="journal" class="space-y-6">
+                        <!-- Chronological records -->
+                    </div>
+                </section>
             </div>
-        </div>
+        </main>
 
-        <footer class="mt-12 flex justify-between items-center px-2 opacity-30">
-            <div class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mono">Statim Audit OS v4.0.0</div>
-            <div class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mono" id="last-updated">--</div>
+        <footer class="mt-12 pt-6 border-t border-slate-800 flex justify-between items-center opacity-40">
+            <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mono">Statim OS v5.0.0-alpha</div>
+            <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mono">High Autonomy Mode: ENABLED</div>
         </footer>
     </div>
 
     <script>
-        async function fetchData() {
+        async function updateDashboard() {
             try {
                 const response = await fetch('public_dashboard.json?nocache=' + Date.now());
                 const data = await response.json();
                 
-                document.getElementById('last-updated').innerText = 'LAST_PULSE: ' + new Date(data.updated_at).toLocaleTimeString();
-                document.getElementById('model-name').innerText = data.system.model.toUpperCase();
+                // Header & Metrics
+                document.getElementById('last-sync').innerText = new Date(data.updated_at).toLocaleTimeString();
                 document.getElementById('brain-activity').innerText = data.system.brain_activity.toUpperCase();
-                document.getElementById('api-eff').innerText = data.performance.api_efficiency + ' EFFICIENCY';
-                document.getElementById('muscle-count').innerText = data.performance.active_muscles + ' ACTIVE';
-                
-                // Update Task Stats if present
-                if (data.task_stats) {
-                    const brainHeader = document.getElementById('brain-activity');
-                    brainHeader.innerHTML = `
-                        <span class="text-blue-500">${data.task_stats.doing} ACTIVE</span> 
-                        <span class="text-gray-700 px-4">/</span> 
-                        <span class="text-gray-400">${data.task_stats.todo} BACKLOG</span>
-                    `;
+                document.getElementById('muscle-count').innerText = data.performance.active_muscles;
+                document.getElementById('api-eff').innerText = data.performance.api_efficiency + '%';
+
+                // Activity Feed (Mapping Notion Tasks)
+                const activityFeed = document.getElementById('activity-feed');
+                if (data.notion_tasks && data.notion_tasks.length > 0) {
+                    activityFeed.innerHTML = '';
+                    data.notion_tasks.forEach(task => {
+                        const priorityColor = task.priority === 'High' ? 'text-rose-400' : 'text-slate-400';
+                        activityFeed.innerHTML += `
+                            <div class="p-4 rounded-lg bg-slate-800/50 border border-slate-700/50 hover:border-sky-500/30 transition-all group">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="text-sm font-bold text-slate-200 group-hover:text-sky-400 transition-colors">${task.name}</h4>
+                                    <span class="text-[9px] mono font-bold ${priorityColor}">${task.priority.toUpperCase()}</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[10px] text-slate-500 mono">${task.status}</span>
+                                    <span class="text-[10px] text-slate-500 mono">OWNER: ${task.owner}</span>
+                                </div>
+                            </div>
+                        `;
+                    });
                 }
 
-                const lastBackup = new Date(data.system.last_backup);
-                const now = new Date();
-                const diffMs = now - lastBackup;
-                const diffMin = Math.floor(diffMs / 1000 / 60);
-                const diffSec = Math.floor((diffMs / 1000) % 60);
-                document.getElementById('github-sync').innerText = diffMin > 0 ? `${diffMin}M ${diffSec}S AGO` : `${diffSec}S AGO`;
-
+                // Journal
                 const journal = document.getElementById('journal');
                 journal.innerHTML = '';
                 data.journal.forEach(entry => {
-                    const isPartnership = entry.startsWith('[PARTNERSHIP]');
+                    const isPartnership = entry.includes('[PARTNERSHIP]');
                     const cleanEntry = entry.replace('[PARTNERSHIP]', '').replace('[SYSTEM]', '');
                     journal.innerHTML += `
-                        <div class="mb-4">
-                            <p class="text-[10px] font-medium ${isPartnership ? 'text-blue-400' : 'text-gray-500'} leading-tight">
-                                ${isPartnership ? '🤝 ' : '>> '}${cleanEntry}
+                        <div class="relative pl-4 border-l-2 ${isPartnership ? 'border-sky-500/30' : 'border-slate-700'}">
+                            <p class="text-xs leading-relaxed ${isPartnership ? 'text-sky-200' : 'text-slate-400'}">
+                                ${cleanEntry}
                             </p>
                         </div>
                     `;
                 });
 
-                const taskList = document.getElementById('notion-tasks');
-                if (data.notion_tasks && data.notion_tasks.length > 0) {
-                    taskList.innerHTML = '';
-                    data.notion_tasks.forEach(task => {
-                        taskList.innerHTML += `
-                            <div class="task-row py-3 flex justify-between items-center group">
-                                <div>
-                                    <p class="text-xs font-bold text-gray-300 group-hover:text-blue-400 transition-colors">${task.name}</p>
-                                    <p class="text-[8px] text-gray-600 mono uppercase mt-1">OWNER: ${task.owner} // STATE: ${task.status}</p>
-                                </div>
-                                <div class="text-[9px] font-bold ${task.priority === 'High' ? 'text-red-500' : 'text-gray-500'} mono">${task.priority.toUpperCase()}</div>
-                            </div>
-                        `;
+                // Simulated Logs for now - In step 3 we propose the real sync
+                const logContainer = document.getElementById('log-container');
+                if (logContainer.children.length < 5) {
+                    const logs = [
+                        "[INFO] WebSocket connection established.",
+                        "[INFO] Syncing local workspace...",
+                        "[DEBUG] Querying model for strategy update...",
+                        "[SYSTEM] ⚡ Dashboard refresh complete."
+                    ];
+                    logs.forEach(log => {
+                        const p = document.createElement('p');
+                        p.className = "text-[10px] text-slate-500 mono leading-relaxed border-b border-slate-800/50 py-1";
+                        p.innerText = log;
+                        logContainer.appendChild(p);
                     });
                 }
-            } catch (err) { console.error(err); }
+
+            } catch (err) { 
+                console.error("Sync Error:", err);
+                document.getElementById('sys-status').innerText = "Sync Error";
+                document.getElementById('sys-status').classList.replace('text-emerald-400', 'text-rose-400');
+            }
         }
-        fetchData();
-        setInterval(fetchData, 15000);
+
+        updateDashboard();
+        setInterval(updateDashboard, 10000);
     </script>
 </body>
 </html>
